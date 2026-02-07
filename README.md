@@ -14,20 +14,46 @@ A modular, extensible Python package for evaluating LLM applications and AI agen
 
 ## Installation
 
+### From PyPI (when published)
+
 ```bash
 pip install llm-eval
 ```
 
-For development with all optional dependencies:
+### From Source with UV (Recommended for Development)
+
+This project uses [UV](https://github.com/astral-sh/uv) for fast, reliable dependency management.
+
+1. **Install UV** (if not already installed):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+2. **Clone the repository**:
+   ```bash
+   git clone https://github.com/sheng-fang/llm-eval.git
+   cd llm-eval
+   ```
+
+3. **Create and activate virtual environment**:
+   ```bash
+   uv venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+
+4. **Install dependencies**:
+   ```bash
+   # Install core dependencies
+   uv pip install -e .
+   
+   # Or install with all optional dependencies (recommended for development)
+   uv pip install -e ".[all]"
+   ```
+
+### Traditional pip Installation from Source
 
 ```bash
-pip install llm-eval[all]
-```
-
-Or install from source:
-
-```bash
-git clone https://github.com/yourusername/llm-eval.git
+git clone https://github.com/sheng-fang/llm-eval.git
 cd llm-eval
 pip install -e .
 ```
