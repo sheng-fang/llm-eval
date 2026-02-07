@@ -1,7 +1,7 @@
 """Result aggregation and analysis utilities."""
 
-from typing import Any, Dict, List, Optional
 from collections import defaultdict
+from typing import Any
 
 from llm_eval.core.trial import TrialResult
 from llm_eval.harness.executor import EvaluationResult
@@ -10,30 +10,30 @@ from llm_eval.harness.executor import EvaluationResult
 class ResultAggregator:
     """
     Aggregates and analyzes evaluation results.
-    
+
     Provides statistics, breakdowns by category, and comparison utilities.
     """
 
     def __init__(self, results: EvaluationResult) -> None:
         """
         Initialize aggregator.
-        
+
         Args:
             results: Evaluation results to analyze
         """
         self.results = results
 
-    def by_task(self) -> Dict[str, List[TrialResult]]:
+    def by_task(self) -> dict[str, list[TrialResult]]:
         """Group results by task."""
-        grouped: Dict[str, List[TrialResult]] = defaultdict(list)
+        grouped: dict[str, list[TrialResult]] = defaultdict(list)
         for result in self.results.results:
             grouped[result.task_id].append(result)
         return dict(grouped)
 
-    def task_statistics(self) -> Dict[str, Dict[str, Any]]:
+    def task_statistics(self) -> dict[str, dict[str, Any]]:
         """
         Calculate statistics for each task.
-        
+
         Returns:
             Dictionary mapping task_id to statistics
         """
@@ -56,7 +56,7 @@ class ResultAggregator:
     def summary_table(self) -> str:
         """
         Generate a summary table of results.
-        
+
         Returns:
             Formatted table string
         """
@@ -89,11 +89,11 @@ class ResultAggregator:
 
         return "\n".join(lines)
 
-    def failed_trials(self) -> List[TrialResult]:
+    def failed_trials(self) -> list[TrialResult]:
         """Get all failed trials."""
         return [r for r in self.results.results if not r.passed]
 
-    def passed_trials(self) -> List[TrialResult]:
+    def passed_trials(self) -> list[TrialResult]:
         """Get all passed trials."""
         return [r for r in self.results.results if r.passed]
 
@@ -101,14 +101,14 @@ class ResultAggregator:
 def compare_results(
     baseline: EvaluationResult,
     current: EvaluationResult,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compare two evaluation results (e.g., before/after a change).
-    
+
     Args:
         baseline: Baseline evaluation results
         current: Current evaluation results
-        
+
     Returns:
         Comparison statistics
     """
@@ -153,15 +153,15 @@ def detect_regressions(
     baseline: EvaluationResult,
     current: EvaluationResult,
     threshold: float = 0.05,
-) -> List[str]:
+) -> list[str]:
     """
     Detect tasks that regressed significantly.
-    
+
     Args:
         baseline: Baseline evaluation results
         current: Current evaluation results
         threshold: Minimum pass rate decrease to consider a regression
-        
+
     Returns:
         List of task IDs that regressed
     """

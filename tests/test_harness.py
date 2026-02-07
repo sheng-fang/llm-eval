@@ -1,7 +1,6 @@
 """Tests for harness and executor."""
 
-import pytest
-from llm_eval import Task, Suite, ExactMatchGrader
+from llm_eval import ExactMatchGrader, Suite, Task
 from llm_eval.harness.base import SimpleHarness
 from llm_eval.harness.executor import Executor
 
@@ -78,6 +77,7 @@ def test_suite_execution():
 
 def test_failed_trial():
     """Test handling of failed trials."""
+
     def failing_agent(input_data):
         raise ValueError("Agent failed")
 

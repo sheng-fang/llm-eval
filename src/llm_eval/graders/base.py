@@ -2,14 +2,14 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 
 @dataclass
 class GraderResult:
     """
     Result from a grader.
-    
+
     Attributes:
         grader_name: Name of the grader
         passed: Whether the grading passed
@@ -22,14 +22,14 @@ class GraderResult:
     passed: bool
     score: float
     feedback: str = ""
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate grader result."""
         if not 0.0 <= self.score <= 1.0:
             raise ValueError(f"Score must be between 0.0 and 1.0, got {self.score}")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert result to dictionary."""
         return {
             "grader_name": self.grader_name,
@@ -43,7 +43,7 @@ class GraderResult:
 class Grader(ABC):
     """
     Abstract base class for all graders.
-    
+
     Graders evaluate agent outputs and return a GraderResult.
     They can be deterministic (code-based) or non-deterministic (model-based).
     """
@@ -51,7 +51,7 @@ class Grader(ABC):
     def __init__(self, name: Optional[str] = None) -> None:
         """
         Initialize grader.
-        
+
         Args:
             name: Optional custom name for the grader
         """
@@ -67,13 +67,13 @@ class Grader(ABC):
     ) -> GraderResult:
         """
         Grade an output.
-        
+
         Args:
             output: The agent's output to grade
             expected: Expected output (if applicable)
             transcript: Optional transcript for context
             **kwargs: Additional grading parameters
-            
+
         Returns:
             GraderResult with score and feedback
         """
@@ -88,16 +88,16 @@ class Grader(ABC):
     ) -> GraderResult:
         """
         Async version of grade. Default implementation calls sync grade.
-        
+
         Override this method for graders that can benefit from async execution
         (e.g., LLM-based graders making API calls).
-        
+
         Args:
             output: The agent's output to grade
             expected: Expected output (if applicable)
             transcript: Optional transcript for context
             **kwargs: Additional grading parameters
-            
+
         Returns:
             GraderResult with score and feedback
         """
@@ -112,20 +112,20 @@ class Grader(ABC):
 class CompositeGrader(Grader):
     """
     Combines multiple graders with a composition strategy.
-    
+
     Supports AND (all must pass), OR (any must pass), and WEIGHTED combinations.
     """
 
     def __init__(
         self,
-        graders: List[Grader],
+        graders: list[Grader],
         strategy: str = "and",
-        weights: Optional[List[float]] = None,
+        weights: Optional[list[float]] = None,
         name: Optional[str] = None,
     ) -> None:
         """
         Initialize composite grader.
-        
+
         Args:
             graders: List of graders to combine
             strategy: Combination strategy ('and', 'or', 'weighted')
@@ -158,9 +158,7 @@ class CompositeGrader(Grader):
         **kwargs: Any,
     ) -> GraderResult:
         """Grade using composite strategy."""
-        results = [
-            grader.grade(output, expected, transcript, **kwargs) for grader in self.graders
-        ]
+        results = [grader.grade(output, expected, transcript, **kwargs) for grader in self.graders]
 
         if self.strategy == "and":
             passed = all(r.passed for r in results)

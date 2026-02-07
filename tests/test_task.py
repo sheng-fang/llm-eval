@@ -1,6 +1,7 @@
 """Tests for core task functionality."""
 
 import pytest
+
 from llm_eval.core.task import Task
 from llm_eval.graders.code_grader import ExactMatchGrader
 

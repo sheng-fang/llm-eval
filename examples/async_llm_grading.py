@@ -5,8 +5,9 @@ Demonstrates async support for LLM-based graders with parallel execution.
 """
 
 import asyncio
-from llm_eval import Task, Suite
-from llm_eval.graders.model_grader import RubricGrader, MultiJudgeGrader
+
+from llm_eval import Suite, Task
+from llm_eval.graders.model_grader import RubricGrader
 from llm_eval.harness.base import SimpleHarness
 from llm_eval.harness.executor import Executor
 
@@ -15,13 +16,13 @@ from llm_eval.harness.executor import Executor
 async def mock_async_llm(prompt: str) -> str:
     """
     Mock async LLM function that simulates API call delay.
-    
+
     In production, this would be an actual async LLM API call
     (e.g., using aiohttp with OpenAI or Anthropic).
     """
     # Simulate API latency
     await asyncio.sleep(0.1)
-    
+
     # Mock response based on prompt content
     if "concise" in prompt.lower():
         return """SCORE: 0.9
@@ -39,7 +40,7 @@ def summary_agent(input_data):
     """Mock agent that generates summaries."""
     topic = input_data.get("topic", "")
     style = input_data.get("style", "concise")
-    
+
     if style == "concise":
         return f"Brief overview of {topic}: Key points covered efficiently."
     else:
@@ -48,7 +49,7 @@ def summary_agent(input_data):
 
 async def main():
     """Main async function to run the evaluation."""
-    
+
     # Create tasks with async LLM graders
     tasks = [
         Task(
@@ -110,7 +111,7 @@ async def main():
     print(results.summary())
 
     from llm_eval.metrics.aggregation import ResultAggregator
-    
+
     aggregator = ResultAggregator(results)
     print("\n" + aggregator.summary_table())
 
@@ -118,7 +119,7 @@ async def main():
     print("\n" + "=" * 80)
     print("LLM GRADER FEEDBACK")
     print("=" * 80)
-    
+
     for task_id, task_results in aggregator.by_task().items():
         print(f"\n{task_id}:")
         for trial in task_results[:1]:  # Show first trial
@@ -131,7 +132,7 @@ async def main():
 def run_sync_example():
     """
     Synchronous wrapper for running the async example.
-    
+
     This allows the example to be run from a non-async context.
     """
     asyncio.run(main())

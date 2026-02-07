@@ -6,7 +6,8 @@ domain-specific evaluation needs.
 """
 
 from typing import Any, Optional
-from llm_eval import Task, Suite
+
+from llm_eval import Suite, Task
 from llm_eval.graders.base import Grader, GraderResult
 from llm_eval.harness.base import SimpleHarness
 from llm_eval.harness.executor import Executor
@@ -15,7 +16,7 @@ from llm_eval.harness.executor import Executor
 class SentimentGrader(Grader):
     """
     Custom grader that checks sentiment of text.
-    
+
     This is a simplified example - in practice, you'd use
     a sentiment analysis model.
     """
@@ -23,7 +24,7 @@ class SentimentGrader(Grader):
     def __init__(self, expected_sentiment: str, name: Optional[str] = None):
         """
         Initialize sentiment grader.
-        
+
         Args:
             expected_sentiment: Expected sentiment ('positive', 'negative', 'neutral')
             name: Optional custom name
@@ -58,9 +59,7 @@ class SentimentGrader(Grader):
         passed = detected_sentiment == self.expected_sentiment
         score = 1.0 if passed else 0.0
 
-        feedback = (
-            f"Expected {self.expected_sentiment}, detected {detected_sentiment}"
-        )
+        feedback = f"Expected {self.expected_sentiment}, detected {detected_sentiment}"
 
         return GraderResult(
             grader_name=self.name,
@@ -89,7 +88,7 @@ class LengthGrader(Grader):
     ):
         """
         Initialize length grader.
-        
+
         Args:
             min_length: Minimum acceptable length
             max_length: Maximum acceptable length
@@ -208,9 +207,9 @@ def main():
     print("=" * 80)
 
     from llm_eval.metrics.aggregation import ResultAggregator
-    
+
     aggregator = ResultAggregator(results)
-    
+
     for task_id, task_results in aggregator.by_task().items():
         print(f"\n{task_id}:")
         for trial in task_results[:1]:  # Show first trial

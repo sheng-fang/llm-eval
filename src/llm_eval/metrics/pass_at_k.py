@@ -1,24 +1,23 @@
 """pass@k and pass^k metrics implementation."""
 
 import math
-from typing import List
 
 
 def pass_at_k(n: int, c: int, k: int) -> float:
     """
     Calculate pass@k metric.
-    
+
     pass@k measures the probability that at least one of k samples passes.
     This uses an unbiased estimator.
-    
+
     Args:
         n: Total number of samples generated
         c: Number of correct samples
         k: Number of samples to consider
-        
+
     Returns:
         Estimated pass@k probability
-        
+
     Reference:
         Chen et al. "Evaluating Large Language Models Trained on Code"
         https://arxiv.org/abs/2107.03374
@@ -32,14 +31,14 @@ def pass_at_k(n: int, c: int, k: int) -> float:
 def pass_power_k(success_rate: float, k: int) -> float:
     """
     Calculate pass^k metric.
-    
+
     pass^k measures the probability that all k trials succeed.
     This is useful for measuring consistency.
-    
+
     Args:
         success_rate: Per-trial success rate (0.0 to 1.0)
         k: Number of trials
-        
+
     Returns:
         Probability that all k trials succeed
     """
@@ -47,16 +46,16 @@ def pass_power_k(success_rate: float, k: int) -> float:
 
 
 def calculate_pass_at_k_from_trials(
-    trial_results: List[bool],
+    trial_results: list[bool],
     k: int,
 ) -> float:
     """
     Calculate pass@k from a list of trial results.
-    
+
     Args:
         trial_results: List of boolean trial results (True = passed)
         k: Number of samples to consider
-        
+
     Returns:
         Estimated pass@k
     """
@@ -66,16 +65,16 @@ def calculate_pass_at_k_from_trials(
 
 
 def calculate_pass_power_k_from_trials(
-    trial_results: List[bool],
+    trial_results: list[bool],
     k: int,
 ) -> float:
     """
     Calculate pass^k from a list of trial results.
-    
+
     Args:
         trial_results: List of boolean trial results (True = passed)
         k: Number of consecutive trials to consider
-        
+
     Returns:
         Estimated pass^k
     """
@@ -94,12 +93,12 @@ def confidence_interval(
 ) -> tuple[float, float]:
     """
     Calculate Wilson score confidence interval for pass rate.
-    
+
     Args:
         successes: Number of successful trials
         total: Total number of trials
         confidence: Confidence level (default 0.95 for 95% CI)
-        
+
     Returns:
         Tuple of (lower_bound, upper_bound)
     """
@@ -126,12 +125,12 @@ class PassAtKCalculator:
 
     def __init__(self) -> None:
         """Initialize calculator."""
-        self.task_results: dict[str, List[bool]] = {}
+        self.task_results: dict[str, list[bool]] = {}
 
     def add_result(self, task_id: str, passed: bool) -> None:
         """
         Add a trial result.
-        
+
         Args:
             task_id: Task identifier
             passed: Whether the trial passed
@@ -143,10 +142,10 @@ class PassAtKCalculator:
     def calculate(self, k: int = 1) -> dict[str, float]:
         """
         Calculate pass@k for all tasks.
-        
+
         Args:
             k: Number of samples to consider
-            
+
         Returns:
             Dictionary mapping task_id to pass@k score
         """
@@ -158,10 +157,10 @@ class PassAtKCalculator:
     def calculate_overall(self, k: int = 1) -> float:
         """
         Calculate overall pass@k across all tasks.
-        
+
         Args:
             k: Number of samples to consider
-            
+
         Returns:
             Average pass@k across all tasks
         """
@@ -173,10 +172,10 @@ class PassAtKCalculator:
     def calculate_pass_power_k(self, k: int = 1) -> dict[str, float]:
         """
         Calculate pass^k for all tasks.
-        
+
         Args:
             k: Number of consecutive trials
-            
+
         Returns:
             Dictionary mapping task_id to pass^k score
         """

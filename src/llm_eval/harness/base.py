@@ -1,7 +1,7 @@
 """Base harness interface."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
 from llm_eval.core.task import Task
 from llm_eval.core.trial import Trial
@@ -10,7 +10,7 @@ from llm_eval.core.trial import Trial
 class BaseHarness(ABC):
     """
     Abstract base class for evaluation harnesses.
-    
+
     A harness is responsible for:
     1. Setting up the environment for each trial
     2. Running the agent on a task
@@ -22,7 +22,7 @@ class BaseHarness(ABC):
     def setup(self, task: Task) -> None:
         """
         Set up the environment for a task.
-        
+
         Args:
             task: Task to set up for
         """
@@ -32,13 +32,13 @@ class BaseHarness(ABC):
     def run_trial(self, task: Task, trial: Trial) -> None:
         """
         Run a single trial of a task.
-        
+
         This method should:
         1. Call trial.start()
         2. Execute the agent
         3. Record interactions in trial.transcript
         4. Call trial.complete() or trial.fail()
-        
+
         Args:
             task: Task to run
             trial: Trial instance to populate
@@ -49,7 +49,7 @@ class BaseHarness(ABC):
     def teardown(self, task: Task) -> None:
         """
         Clean up after a task.
-        
+
         Args:
             task: Task to clean up for
         """
@@ -59,18 +59,18 @@ class BaseHarness(ABC):
 class SimpleHarness(BaseHarness):
     """
     Simple harness for basic LLM evaluation.
-    
+
     Runs a function that takes input and returns output.
     """
 
     def __init__(
         self,
-        agent_fn: Callable[[Dict[str, Any]], Any],
+        agent_fn: Callable[[dict[str, Any]], Any],
         capture_transcript: bool = True,
     ) -> None:
         """
         Initialize simple harness.
-        
+
         Args:
             agent_fn: Function that takes input_data and returns output
             capture_transcript: Whether to capture transcript (requires agent_fn support)
@@ -104,19 +104,19 @@ class SimpleHarness(BaseHarness):
 class CallbackHarness(BaseHarness):
     """
     Harness with custom setup/teardown callbacks.
-    
+
     Useful for more complex scenarios requiring environment preparation.
     """
 
     def __init__(
         self,
-        agent_fn: Callable[[Dict[str, Any]], Any],
+        agent_fn: Callable[[dict[str, Any]], Any],
         setup_fn: Optional[Callable[[Task], None]] = None,
         teardown_fn: Optional[Callable[[Task], None]] = None,
     ) -> None:
         """
         Initialize callback harness.
-        
+
         Args:
             agent_fn: Function that takes input_data and returns output
             setup_fn: Optional setup function

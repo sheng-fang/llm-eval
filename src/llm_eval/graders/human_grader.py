@@ -1,6 +1,6 @@
 """Human grading interfaces."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from llm_eval.graders.base import Grader, GraderResult
 
@@ -8,7 +8,7 @@ from llm_eval.graders.base import Grader, GraderResult
 class HumanGrader(Grader):
     """
     Interactive human grading interface.
-    
+
     Prompts a human to grade the output during evaluation.
     Useful for calibration and spot-checking.
     """
@@ -20,7 +20,7 @@ class HumanGrader(Grader):
     ) -> None:
         """
         Initialize human grader.
-        
+
         Args:
             criteria: Grading criteria to show the human
             name: Optional custom name
@@ -75,7 +75,7 @@ class HumanGrader(Grader):
 class BatchHumanGrader:
     """
     Batch human grading interface.
-    
+
     Collects outputs for batch grading rather than grading one at a time.
     More efficient for grading many outputs.
     """
@@ -83,12 +83,12 @@ class BatchHumanGrader:
     def __init__(self, criteria: str = "overall quality") -> None:
         """
         Initialize batch human grader.
-        
+
         Args:
             criteria: Grading criteria
         """
         self.criteria = criteria
-        self.pending_grades: List[Dict[str, Any]] = []
+        self.pending_grades: list[dict[str, Any]] = []
 
     def add_for_grading(
         self,
@@ -98,7 +98,7 @@ class BatchHumanGrader:
     ) -> None:
         """
         Add an output for batch grading.
-        
+
         Args:
             task_id: Task identifier
             output: Output to grade
@@ -112,10 +112,10 @@ class BatchHumanGrader:
             }
         )
 
-    def grade_batch(self) -> Dict[str, GraderResult]:
+    def grade_batch(self) -> dict[str, GraderResult]:
         """
         Grade all pending outputs interactively.
-        
+
         Returns:
             Dictionary mapping task_id to GraderResult
         """
@@ -130,7 +130,7 @@ class BatchHumanGrader:
             print(f"Criteria: {self.criteria}")
             print(f"\nOutput:\n{item['output']}")
 
-            if item['expected'] is not None:
+            if item["expected"] is not None:
                 print(f"\nExpected:\n{item['expected']}")
 
             print("\n" + "-" * 80)
@@ -165,7 +165,7 @@ class BatchHumanGrader:
     def export_for_crowdsourcing(self, filepath: str) -> None:
         """
         Export pending grades to a file for crowdsourcing.
-        
+
         Args:
             filepath: Path to save the export
         """

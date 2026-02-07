@@ -1,7 +1,7 @@
 """Task definition and management."""
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from llm_eval.graders.base import Grader
 
@@ -10,10 +10,10 @@ from llm_eval.graders.base import Grader
 class Task:
     """
     Represents a single evaluation task.
-    
+
     A task defines what to test, including inputs, expected outputs,
     and graders to evaluate the agent's performance.
-    
+
     Attributes:
         id: Unique identifier for the task
         description: Human-readable description of what the task tests
@@ -25,10 +25,10 @@ class Task:
 
     id: str
     description: str
-    input_data: Dict[str, Any]
-    graders: List[Grader] = field(default_factory=list)
+    input_data: dict[str, Any]
+    graders: list[Grader] = field(default_factory=list)
     reference_solution: Optional[Any] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate task configuration."""
@@ -50,11 +50,11 @@ class Task:
         return self.metadata.get("difficulty")
 
     @property
-    def tags(self) -> List[str]:
+    def tags(self) -> list[str]:
         """Get task tags from metadata."""
         return self.metadata.get("tags", [])
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert task to dictionary representation."""
         return {
             "id": self.id,
@@ -66,14 +66,14 @@ class Task:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any], graders: List[Grader]) -> "Task":
+    def from_dict(cls, data: dict[str, Any], graders: list[Grader]) -> "Task":
         """
         Create a task from dictionary representation.
-        
+
         Args:
             data: Dictionary containing task data
             graders: List of grader instances to use
-            
+
         Returns:
             Task instance
         """

@@ -1,8 +1,8 @@
 """Additional specialized graders for various use cases."""
 
 import re
-from typing import Any, Optional, List, Callable
 from difflib import SequenceMatcher
+from typing import Any, Callable, Optional
 
 from llm_eval.graders.base import Grader, GraderResult
 
@@ -10,7 +10,7 @@ from llm_eval.graders.base import Grader, GraderResult
 class NumericGrader(Grader):
     """
     Grades numeric outputs with tolerance.
-    
+
     Useful for evaluating mathematical computations, measurements, etc.
     """
 
@@ -23,7 +23,7 @@ class NumericGrader(Grader):
     ) -> None:
         """
         Initialize numeric grader.
-        
+
         Args:
             expected: Expected numeric value
             tolerance: Acceptable deviation (absolute or relative)
@@ -111,7 +111,7 @@ class NumericGrader(Grader):
 class SimilarityGrader(Grader):
     """
     Grades based on string similarity using various algorithms.
-    
+
     Useful for fuzzy matching when exact match is too strict.
     """
 
@@ -125,7 +125,7 @@ class SimilarityGrader(Grader):
     ) -> None:
         """
         Initialize similarity grader.
-        
+
         Args:
             expected: Expected output string
             threshold: Minimum similarity score to pass (0.0 to 1.0)
@@ -233,20 +233,20 @@ class SimilarityGrader(Grader):
 class SemanticSimilarityGrader(Grader):
     """
     Grades based on semantic similarity using embeddings.
-    
+
     Requires an embedding function (e.g., from OpenAI, sentence-transformers).
     """
 
     def __init__(
         self,
         expected: str,
-        embedding_fn: Callable[[str], List[float]],
+        embedding_fn: Callable[[str], list[float]],
         threshold: float = 0.85,
         name: Optional[str] = None,
     ) -> None:
         """
         Initialize semantic similarity grader.
-        
+
         Args:
             expected: Expected output string
             embedding_fn: Function that takes text and returns embedding vector
@@ -257,7 +257,7 @@ class SemanticSimilarityGrader(Grader):
         self.expected = expected
         self.embedding_fn = embedding_fn
         self.threshold = threshold
-        self._expected_embedding: Optional[List[float]] = None
+        self._expected_embedding: Optional[list[float]] = None
 
     def grade(
         self,
@@ -308,7 +308,7 @@ class SemanticSimilarityGrader(Grader):
                 feedback=f"Embedding error: {str(e)}",
             )
 
-    def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
+    def _cosine_similarity(self, vec1: list[float], vec2: list[float]) -> float:
         """Calculate cosine similarity between two vectors."""
         if len(vec1) != len(vec2):
             raise ValueError("Vectors must have same length")
@@ -326,7 +326,7 @@ class SemanticSimilarityGrader(Grader):
 class LengthRangeGrader(Grader):
     """
     Grades based on output length being within a range.
-    
+
     Useful for ensuring responses are appropriately concise or detailed.
     """
 
@@ -339,7 +339,7 @@ class LengthRangeGrader(Grader):
     ) -> None:
         """
         Initialize length range grader.
-        
+
         Args:
             min_length: Minimum acceptable length
             max_length: Maximum acceptable length
@@ -399,7 +399,11 @@ class LengthRangeGrader(Grader):
         elif self.min_length:
             score = min(1.0, length / self.min_length) if length < self.min_length else 1.0
         elif self.max_length:
-            score = 1.0 if length <= self.max_length else max(0.0, 1.0 - (length - self.max_length) / self.max_length)
+            score = (
+                1.0
+                if length <= self.max_length
+                else max(0.0, 1.0 - (length - self.max_length) / self.max_length)
+            )
         else:
             score = 1.0
 
@@ -415,7 +419,7 @@ class LengthRangeGrader(Grader):
 class FormatGrader(Grader):
     """
     Grades based on output format (JSON, XML, Markdown, etc.).
-    
+
     Useful for ensuring structured outputs.
     """
 
@@ -427,7 +431,7 @@ class FormatGrader(Grader):
     ) -> None:
         """
         Initialize format grader.
-        
+
         Args:
             format_type: Expected format ('json', 'xml', 'markdown', 'yaml')
             strict: Whether to enforce strict format validation
@@ -450,12 +454,14 @@ class FormatGrader(Grader):
         try:
             if self.format_type == "json":
                 import json
+
                 json.loads(text)
                 passed = True
                 feedback = "Valid JSON format"
 
             elif self.format_type == "xml":
                 import xml.etree.ElementTree as ET
+
                 ET.fromstring(text)
                 passed = True
                 feedback = "Valid XML format"
@@ -463,6 +469,7 @@ class FormatGrader(Grader):
             elif self.format_type == "yaml":
                 try:
                     import yaml
+
                     yaml.safe_load(text)
                     passed = True
                     feedback = "Valid YAML format"

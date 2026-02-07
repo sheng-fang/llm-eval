@@ -5,12 +5,12 @@ Demonstrates the new specialized graders for various use cases.
 """
 
 from llm_eval import (
-    Task,
-    Suite,
-    NumericGrader,
-    SimilarityGrader,
     FormatGrader,
     LengthRangeGrader,
+    NumericGrader,
+    SimilarityGrader,
+    Suite,
+    Task,
 )
 from llm_eval.harness.base import SimpleHarness
 from llm_eval.harness.executor import Executor
@@ -20,7 +20,7 @@ from llm_eval.harness.executor import Executor
 def math_agent(input_data):
     """Agent that solves math problems."""
     problem = input_data.get("problem", "")
-    
+
     if "2+2" in problem:
         return "The answer is 4"
     elif "pi" in problem.lower():
@@ -34,7 +34,7 @@ def math_agent(input_data):
 def json_agent(input_data):
     """Agent that generates JSON responses."""
     request = input_data.get("request", "")
-    
+
     if "user" in request.lower():
         return '{"name": "John Doe", "age": 30, "email": "john@example.com"}'
     else:
@@ -44,14 +44,13 @@ def json_agent(input_data):
 def paraphrase_agent(input_data):
     """Agent that paraphrases text."""
     text = input_data.get("text", "")
-    
+
     # Simple paraphrasing (in reality, would use LLM)
     paraphrases = {
-        "The quick brown fox jumps over the lazy dog": 
-            "A fast brown fox leaps over a sleepy dog",
+        "The quick brown fox jumps over the lazy dog": "A fast brown fox leaps over a sleepy dog",
         "Hello world": "Greetings, world",
     }
-    
+
     return paraphrases.get(text, "Paraphrased version of the text")
 
 
@@ -72,7 +71,6 @@ def main():
             ],
             metadata={"category": "math"},
         ),
-        
         # Similarity grading
         Task(
             id="paraphrase_fox",
@@ -88,7 +86,6 @@ def main():
             ],
             metadata={"category": "nlp"},
         ),
-        
         # Format grading (JSON)
         Task(
             id="json_user",
@@ -104,7 +101,6 @@ def main():
             ],
             metadata={"category": "structured_output"},
         ),
-        
         # Multiple numeric tests
         Task(
             id="math_sqrt",
@@ -145,7 +141,7 @@ def main():
         problem = input_data.get("problem", "")
         request = input_data.get("request", "")
         text = input_data.get("text", "")
-        
+
         if problem:
             return math_agent(input_data)
         elif request:
@@ -167,7 +163,7 @@ def main():
     print(results.summary())
 
     from llm_eval.metrics.aggregation import ResultAggregator
-    
+
     aggregator = ResultAggregator(results)
     print("\n" + aggregator.summary_table())
 
@@ -175,7 +171,7 @@ def main():
     print("\n" + "=" * 80)
     print("DETAILED GRADER FEEDBACK")
     print("=" * 80)
-    
+
     for task_id, task_results in aggregator.by_task().items():
         print(f"\n{task_id}:")
         trial = task_results[0]  # First trial

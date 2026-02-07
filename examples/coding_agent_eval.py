@@ -5,7 +5,7 @@ This example demonstrates evaluating a coding agent with
 unit tests and code quality checks.
 """
 
-from llm_eval import Task, Suite, PythonAssertionGrader
+from llm_eval import PythonAssertionGrader, Suite, Task
 from llm_eval.graders.code_grader import ContainsGrader
 from llm_eval.harness.base import SimpleHarness
 from llm_eval.harness.executor import Executor
@@ -15,11 +15,11 @@ from llm_eval.harness.executor import Executor
 def coding_agent(input_data):
     """
     A mock coding agent that generates Python code.
-    
+
     In reality, this would use an LLM to generate code.
     """
     task_description = input_data.get("task", "")
-    
+
     # Mock code generation
     if "fibonacci" in task_description.lower():
         return """
@@ -45,20 +45,15 @@ def test_fibonacci_code(code):
         # Execute the code
         namespace = {}
         exec(code, namespace)
-        
+
         # Test the function
         if "fibonacci" not in namespace:
             return False
-        
+
         fib = namespace["fibonacci"]
-        
+
         # Test cases
-        return (
-            fib(0) == 0
-            and fib(1) == 1
-            and fib(5) == 5
-            and fib(10) == 55
-        )
+        return fib(0) == 0 and fib(1) == 1 and fib(5) == 5 and fib(10) == 55
     except Exception:
         return False
 
@@ -68,18 +63,13 @@ def test_factorial_code(code):
     try:
         namespace = {}
         exec(code, namespace)
-        
+
         if "factorial" not in namespace:
             return False
-        
+
         fact = namespace["factorial"]
-        
-        return (
-            fact(0) == 1
-            and fact(1) == 1
-            and fact(5) == 120
-            and fact(10) == 3628800
-        )
+
+        return fact(0) == 1 and fact(1) == 1 and fact(5) == 120 and fact(10) == 3628800
     except Exception:
         return False
 
@@ -90,9 +80,7 @@ def main():
         Task(
             id="fibonacci_implementation",
             description="Implement Fibonacci function",
-            input_data={
-                "task": "Write a Python function to calculate the nth Fibonacci number"
-            },
+            input_data={"task": "Write a Python function to calculate the nth Fibonacci number"},
             graders=[
                 ContainsGrader(
                     expected_substrings=["def fibonacci", "return"],
@@ -108,9 +96,7 @@ def main():
         Task(
             id="factorial_implementation",
             description="Implement factorial function",
-            input_data={
-                "task": "Write a Python function to calculate factorial of n"
-            },
+            input_data={"task": "Write a Python function to calculate factorial of n"},
             graders=[
                 ContainsGrader(
                     expected_substrings=["def factorial", "return"],
@@ -135,7 +121,7 @@ def main():
     # Run evaluation
     harness = SimpleHarness(agent_fn=coding_agent)
     executor = Executor(harness=harness, max_workers=2, verbose=True)
-    
+
     results = executor.run_suite(suite, num_trials=5)
 
     # Show results
@@ -146,7 +132,7 @@ def main():
 
     # Detailed breakdown
     from llm_eval.metrics.aggregation import ResultAggregator
-    
+
     aggregator = ResultAggregator(results)
     print("\n" + aggregator.summary_table())
 
@@ -154,7 +140,7 @@ def main():
     print("\n" + "=" * 80)
     print("GRADER BREAKDOWN")
     print("=" * 80)
-    
+
     for task_id, task_results in aggregator.by_task().items():
         print(f"\n{task_id}:")
         for trial in task_results:

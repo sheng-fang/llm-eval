@@ -5,7 +5,7 @@ This example demonstrates basic usage of llm-eval for evaluating
 a simple question-answering system.
 """
 
-from llm_eval import Task, Suite, ExactMatchGrader
+from llm_eval import ExactMatchGrader, Suite, Task
 from llm_eval.graders.code_grader import ContainsGrader
 from llm_eval.harness.base import SimpleHarness
 from llm_eval.harness.executor import Executor
@@ -16,18 +16,18 @@ from llm_eval.metrics.aggregation import ResultAggregator
 def simple_qa_agent(input_data):
     """
     A simple Q&A agent (mock implementation).
-    
+
     In a real scenario, this would call an LLM API.
     """
     question = input_data.get("question", "")
-    
+
     # Mock responses
     responses = {
         "What is the capital of France?": "Paris",
         "What is 2+2?": "4",
         "Who wrote Romeo and Juliet?": "William Shakespeare",
     }
-    
+
     return responses.get(question, "I don't know")
 
 

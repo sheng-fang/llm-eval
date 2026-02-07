@@ -1,10 +1,9 @@
 """Model-based (LLM-as-judge) graders with async support."""
 
-from typing import Any, Callable, Dict, List, Optional, Union
 import asyncio
+from typing import Any, Callable, Optional, Union
 
 from llm_eval.graders.base import Grader, GraderResult
-
 
 # Type aliases for LLM functions
 SyncLLMFunction = Callable[[str], str]
@@ -14,7 +13,7 @@ AsyncLLMFunction = Callable[[str], Any]  # Returns awaitable
 class RubricGrader(Grader):
     """
     Grades using an LLM with a detailed rubric.
-    
+
     Supports both sync and async LLM functions.
     """
 
@@ -29,7 +28,7 @@ class RubricGrader(Grader):
     ) -> None:
         """
         Initialize rubric grader.
-        
+
         Args:
             rubric: Grading rubric or criteria
             llm_fn: Function that takes a prompt and returns LLM response
@@ -77,7 +76,7 @@ class RubricGrader(Grader):
                     score=0.0,
                     feedback=f"Grading error: {str(e)}",
                 )
-        
+
         # Async LLM function - need to run in event loop
         try:
             # Try to get existing event loop
@@ -93,11 +92,13 @@ class RubricGrader(Grader):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
-                return loop.run_until_complete(self.async_grade(output, expected, transcript, **kwargs))
+                return loop.run_until_complete(
+                    self.async_grade(output, expected, transcript, **kwargs)
+                )
             finally:
                 loop.close()
                 asyncio.set_event_loop(None)
-        
+
         # Have a loop but it's not running - use it
         return loop.run_until_complete(self.async_grade(output, expected, transcript, **kwargs))
 
@@ -118,7 +119,7 @@ class RubricGrader(Grader):
                 # Run sync function in executor to avoid blocking
                 loop = asyncio.get_event_loop()
                 llm_response = await loop.run_in_executor(None, self.llm_fn, prompt)
-            
+
             score = self.parse_score_fn(llm_response)
             passed = score >= 0.5
 
@@ -186,7 +187,7 @@ FEEDBACK: <your feedback>
 class PairwiseGrader(Grader):
     """
     Grades by comparing two outputs using an LLM.
-    
+
     Supports both sync and async LLM functions.
     """
 
@@ -200,7 +201,7 @@ class PairwiseGrader(Grader):
     ) -> None:
         """
         Initialize pairwise grader.
-        
+
         Args:
             llm_fn: Function that takes a prompt and returns LLM response
             criteria: Criteria for comparison
@@ -239,7 +240,9 @@ class PairwiseGrader(Grader):
                 winner, confidence = self._parse_comparison(llm_response)
 
                 passed = winner in ["A", "TIE"]
-                score = confidence if winner == "A" else (0.5 if winner == "TIE" else 1.0 - confidence)
+                score = (
+                    confidence if winner == "A" else (0.5 if winner == "TIE" else 1.0 - confidence)
+                )
 
                 return GraderResult(
                     grader_name=self.name,
@@ -266,7 +269,9 @@ class PairwiseGrader(Grader):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
-                return loop.run_until_complete(self.async_grade(output, expected, transcript, **kwargs))
+                return loop.run_until_complete(
+                    self.async_grade(output, expected, transcript, **kwargs)
+                )
             finally:
                 loop.close()
                 asyncio.set_event_loop(None)
@@ -357,7 +362,7 @@ REASONING: <your reasoning>
 class MultiJudgeGrader(Grader):
     """
     Uses multiple LLM judges and aggregates their scores.
-    
+
     Supports async execution for parallel judge calls.
     """
 
@@ -370,7 +375,7 @@ class MultiJudgeGrader(Grader):
     ) -> None:
         """
         Initialize multi-judge grader.
-        
+
         Args:
             base_grader: Base grader to run multiple times
             num_judges: Number of judges (runs)
@@ -412,7 +417,7 @@ class MultiJudgeGrader(Grader):
         results = await asyncio.gather(*tasks)
         return self._aggregate_results(list(results))
 
-    def _aggregate_results(self, results: List[GraderResult]) -> GraderResult:
+    def _aggregate_results(self, results: list[GraderResult]) -> GraderResult:
         """Aggregate multiple grader results."""
         scores = [r.score for r in results]
 

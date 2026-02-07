@@ -2,11 +2,11 @@
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, Optional
 
 from rich.console import Console
-from rich.progress import Progress, TaskID
+from rich.progress import Progress
 
 from llm_eval.core.suite import Suite
 from llm_eval.core.task import Task
@@ -18,7 +18,7 @@ from llm_eval.harness.base import BaseHarness
 class EvaluationResult:
     """
     Results from running an evaluation suite.
-    
+
     Attributes:
         suite_name: Name of the suite
         results: List of all trial results
@@ -28,10 +28,10 @@ class EvaluationResult:
     """
 
     suite_name: str
-    results: List[TrialResult] = field(default_factory=list)
+    results: list[TrialResult] = field(default_factory=list)
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def duration(self) -> Optional[float]:
@@ -43,7 +43,7 @@ class EvaluationResult:
     @property
     def num_tasks(self) -> int:
         """Get number of unique tasks."""
-        return len(set(r.task_id for r in self.results))
+        return len({r.task_id for r in self.results})
 
     @property
     def num_trials(self) -> int:
@@ -65,7 +65,7 @@ class EvaluationResult:
             return 0.0
         return sum(r.score for r in self.results) / len(self.results)
 
-    def get_task_results(self, task_id: str) -> List[TrialResult]:
+    def get_task_results(self, task_id: str) -> list[TrialResult]:
         """Get all results for a specific task."""
         return [r for r in self.results if r.task_id == task_id]
 
@@ -73,7 +73,7 @@ class EvaluationResult:
         """Get a summary string of the results."""
         lines = [
             f"Evaluation Results: {self.suite_name}",
-            f"=" * 60,
+            "=" * 60,
             f"Tasks: {self.num_tasks}",
             f"Trials: {self.num_trials}",
             f"Pass Rate: {self.pass_rate:.1%}",
@@ -82,7 +82,7 @@ class EvaluationResult:
         ]
         return "\n".join(lines)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert results to dictionary."""
         return {
             "suite_name": self.suite_name,
@@ -101,7 +101,7 @@ class EvaluationResult:
 class Executor:
     """
     Parallel execution engine for running evaluations.
-    
+
     Handles concurrent task execution, multiple trials per task,
     progress tracking, and result aggregation.
     """
@@ -114,7 +114,7 @@ class Executor:
     ) -> None:
         """
         Initialize executor.
-        
+
         Args:
             harness: Harness to use for running trials
             max_workers: Maximum number of parallel workers
@@ -132,11 +132,11 @@ class Executor:
     ) -> EvaluationResult:
         """
         Run an entire evaluation suite.
-        
+
         Args:
             suite: Suite to run
             num_trials: Number of trials per task
-            
+
         Returns:
             EvaluationResult with all trial results
         """
@@ -155,7 +155,7 @@ class Executor:
         eval_result.end_time = datetime.now()
 
         if self.verbose and self.console:
-            self.console.print(f"\n[bold green]✓ Evaluation complete![/bold green]")
+            self.console.print("\n[bold green]✓ Evaluation complete![/bold green]")
             self.console.print(eval_result.summary())
 
         return eval_result
@@ -164,21 +164,21 @@ class Executor:
         self,
         task: Task,
         num_trials: int = 1,
-    ) -> List[TrialResult]:
+    ) -> list[TrialResult]:
         """
         Run a single task with multiple trials.
-        
+
         Args:
             task: Task to run
             num_trials: Number of trials
-            
+
         Returns:
             List of TrialResults
         """
         # Setup
         self.harness.setup(task)
 
-        results: List[TrialResult] = []
+        results: list[TrialResult] = []
 
         try:
             if self.verbose and self.console:
@@ -203,8 +203,7 @@ class Executor:
                 # Run without progress bar
                 with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
                     futures = [
-                        executor.submit(self._run_single_trial, task, i)
-                        for i in range(num_trials)
+                        executor.submit(self._run_single_trial, task, i) for i in range(num_trials)
                     ]
                     results = [f.result() for f in as_completed(futures)]
 

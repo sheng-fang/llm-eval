@@ -2,7 +2,8 @@
 
 import json
 import re
-from typing import Any, Callable, Dict, Optional, Pattern
+from re import Pattern
+from typing import Any, Callable, Optional
 
 from llm_eval.graders.base import Grader, GraderResult
 
@@ -19,7 +20,7 @@ class ExactMatchGrader(Grader):
     ) -> None:
         """
         Initialize exact match grader.
-        
+
         Args:
             expected: Expected output string
             case_sensitive: Whether to match case
@@ -74,7 +75,7 @@ class RegexGrader(Grader):
     ) -> None:
         """
         Initialize regex grader.
-        
+
         Args:
             pattern: Regex pattern to match
             flags: Regex flags (e.g., re.IGNORECASE)
@@ -122,13 +123,13 @@ class JsonSchemaGrader(Grader):
 
     def __init__(
         self,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
         strict: bool = True,
         name: Optional[str] = None,
     ) -> None:
         """
         Initialize JSON schema grader.
-        
+
         Args:
             schema: JSON schema to validate against
             strict: Whether to require exact schema match
@@ -176,9 +177,7 @@ class JsonSchemaGrader(Grader):
                 feedback=f"Invalid JSON: {str(e)}",
             )
 
-    def _validate_schema(
-        self, data: Any, schema: Dict[str, Any], path: str = "root"
-    ) -> list[str]:
+    def _validate_schema(self, data: Any, schema: dict[str, Any], path: str = "root") -> list[str]:
         """Simple schema validation (basic implementation)."""
         errors = []
 
@@ -219,7 +218,7 @@ class PythonAssertionGrader(Grader):
     ) -> None:
         """
         Initialize assertion grader.
-        
+
         Args:
             assertion_fn: Function that takes output and returns True if valid
             error_message: Error message when assertion fails
@@ -270,7 +269,7 @@ class ContainsGrader(Grader):
     ) -> None:
         """
         Initialize contains grader.
-        
+
         Args:
             expected_substrings: List of substrings to check for
             require_all: If True, all substrings must be present; if False, any one is enough
@@ -304,9 +303,7 @@ class ContainsGrader(Grader):
         if self.require_all:
             passed = len(missing) == 0
             feedback = (
-                "All substrings found"
-                if passed
-                else f"Missing substrings: {', '.join(missing)}"
+                "All substrings found" if passed else f"Missing substrings: {', '.join(missing)}"
             )
         else:
             passed = len(found) > 0

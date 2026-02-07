@@ -1,16 +1,16 @@
 """Transcript recording for evaluation trials."""
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Dict, List, Optional
 import json
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Optional
 
 
 @dataclass
 class TranscriptEntry:
     """
     A single entry in the transcript.
-    
+
     Attributes:
         timestamp: When this entry was recorded
         entry_type: Type of entry (e.g., 'llm_call', 'tool_call', 'response')
@@ -19,9 +19,9 @@ class TranscriptEntry:
 
     timestamp: datetime
     entry_type: str
-    data: Dict[str, Any]
+    data: dict[str, Any]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert entry to dictionary."""
         return {
             "timestamp": self.timestamp.isoformat(),
@@ -33,7 +33,7 @@ class TranscriptEntry:
 class Transcript:
     """
     Records the complete interaction history of a trial.
-    
+
     A transcript contains all LLM API calls, responses, tool calls,
     intermediate reasoning steps, and any other interactions during
     the evaluation trial.
@@ -41,7 +41,7 @@ class Transcript:
 
     def __init__(self) -> None:
         """Initialize an empty transcript."""
-        self.entries: List[TranscriptEntry] = []
+        self.entries: list[TranscriptEntry] = []
         self.start_time: Optional[datetime] = None
         self.end_time: Optional[datetime] = None
 
@@ -56,12 +56,12 @@ class Transcript:
     def add_llm_call(
         self,
         model: str,
-        messages: List[Dict[str, Any]],
+        messages: list[dict[str, Any]],
         **kwargs: Any,
     ) -> None:
         """
         Record an LLM API call.
-        
+
         Args:
             model: Model identifier
             messages: Messages sent to the LLM
@@ -82,12 +82,12 @@ class Transcript:
     def add_llm_response(
         self,
         response: str,
-        usage: Optional[Dict[str, int]] = None,
+        usage: Optional[dict[str, int]] = None,
         **kwargs: Any,
     ) -> None:
         """
         Record an LLM response.
-        
+
         Args:
             response: The response text
             usage: Token usage information
@@ -108,11 +108,11 @@ class Transcript:
     def add_tool_call(
         self,
         tool_name: str,
-        arguments: Dict[str, Any],
+        arguments: dict[str, Any],
     ) -> None:
         """
         Record a tool call.
-        
+
         Args:
             tool_name: Name of the tool being called
             arguments: Arguments passed to the tool
@@ -136,7 +136,7 @@ class Transcript:
     ) -> None:
         """
         Record a tool result.
-        
+
         Args:
             tool_name: Name of the tool
             result: Result returned by the tool
@@ -157,11 +157,11 @@ class Transcript:
     def add_custom(
         self,
         entry_type: str,
-        data: Dict[str, Any],
+        data: dict[str, Any],
     ) -> None:
         """
         Record a custom entry.
-        
+
         Args:
             entry_type: Type identifier for the entry
             data: Entry data
@@ -181,7 +181,7 @@ class Transcript:
             return (self.end_time - self.start_time).total_seconds()
         return None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert transcript to dictionary."""
         return {
             "start_time": self.start_time.isoformat() if self.start_time else None,
@@ -193,10 +193,10 @@ class Transcript:
     def to_json(self, indent: Optional[int] = 2) -> str:
         """
         Convert transcript to JSON string.
-        
+
         Args:
             indent: JSON indentation level
-            
+
         Returns:
             JSON string representation
         """
@@ -205,7 +205,7 @@ class Transcript:
     def save(self, filepath: str) -> None:
         """
         Save transcript to a JSON file.
-        
+
         Args:
             filepath: Path to save the transcript
         """
@@ -216,14 +216,14 @@ class Transcript:
     def load(cls, filepath: str) -> "Transcript":
         """
         Load transcript from a JSON file.
-        
+
         Args:
             filepath: Path to the transcript file
-            
+
         Returns:
             Transcript instance
         """
-        with open(filepath, "r") as f:
+        with open(filepath) as f:
             data = json.load(f)
 
         transcript = cls()

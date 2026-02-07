@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from llm_eval.core.transcript import Transcript
 from llm_eval.graders.base import GraderResult
@@ -22,7 +22,7 @@ class TrialStatus(Enum):
 class TrialResult:
     """
     Result of a single trial.
-    
+
     Attributes:
         task_id: ID of the task that was run
         trial_number: Trial number (for multiple trials of same task)
@@ -41,13 +41,13 @@ class TrialResult:
     trial_number: int
     status: TrialStatus
     output: Any = None
-    outcome: Optional[Dict[str, Any]] = None
+    outcome: Optional[dict[str, Any]] = None
     transcript: Optional[Transcript] = None
-    grader_results: List[GraderResult] = field(default_factory=list)
+    grader_results: list[GraderResult] = field(default_factory=list)
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     error: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def duration(self) -> Optional[float]:
@@ -70,7 +70,7 @@ class TrialResult:
             return 0.0
         return sum(result.score for result in self.grader_results) / len(self.grader_results)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert result to dictionary."""
         return {
             "task_id": self.task_id,
@@ -92,7 +92,7 @@ class TrialResult:
 class Trial:
     """
     Manages the execution of a single trial.
-    
+
     A trial represents one attempt at completing a task. Multiple trials
     are typically run for each task to handle non-deterministic behavior.
     """
@@ -100,7 +100,7 @@ class Trial:
     def __init__(self, task_id: str, trial_number: int) -> None:
         """
         Initialize a trial.
-        
+
         Args:
             task_id: ID of the task to run
             trial_number: Trial number
@@ -110,11 +110,11 @@ class Trial:
         self.status = TrialStatus.PENDING
         self.transcript = Transcript()
         self.output: Any = None
-        self.outcome: Optional[Dict[str, Any]] = None
+        self.outcome: Optional[dict[str, Any]] = None
         self.start_time: Optional[datetime] = None
         self.end_time: Optional[datetime] = None
         self.error: Optional[str] = None
-        self.metadata: Dict[str, Any] = {}
+        self.metadata: dict[str, Any] = {}
 
     def start(self) -> None:
         """Mark trial as started."""
@@ -122,10 +122,10 @@ class Trial:
         self.start_time = datetime.now()
         self.transcript.start()
 
-    def complete(self, output: Any, outcome: Optional[Dict[str, Any]] = None) -> None:
+    def complete(self, output: Any, outcome: Optional[dict[str, Any]] = None) -> None:
         """
         Mark trial as completed.
-        
+
         Args:
             output: The agent's output
             outcome: Final state in the environment
@@ -139,7 +139,7 @@ class Trial:
     def fail(self, error: str) -> None:
         """
         Mark trial as failed.
-        
+
         Args:
             error: Error message
         """
@@ -148,13 +148,13 @@ class Trial:
         self.transcript.end()
         self.error = error
 
-    def to_result(self, grader_results: List[GraderResult]) -> TrialResult:
+    def to_result(self, grader_results: list[GraderResult]) -> TrialResult:
         """
         Convert trial to result.
-        
+
         Args:
             grader_results: Results from grading this trial
-            
+
         Returns:
             TrialResult instance
         """

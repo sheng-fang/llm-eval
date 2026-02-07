@@ -105,3 +105,8 @@ ignore = [
 [tool.black]
 line-length = 100
 target-version = ["py39"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.0",
+]
